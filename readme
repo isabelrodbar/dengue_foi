@@ -1,0 +1,12 @@
+
+This repository includes example code to estimate forces of infection for dengue as described in "Opportunities for improved surveillance and control of infectious diseases from age-specific case data: insight from dengue
+"
+The data folder contains example data from Brazil.
+"dhf_brazil_2002_2015.Rdata": Age-specific counts for Brazil 2002:2015
+"census_brazil_2002_2015.Rdata" Census projections for Braizl 2002:2015
+
+The code folder contains example code and functions required to fit the model
+"Example_code.R": Code to run an example and estimate forces of infection from the data
+"ll.1_pois.R": Likelihood function to produce estimates (maximum likelihood optimization"
+"stan_code1.stan" Stan code
+"figure_plot_stan_output.R" Function to plot stan model outputs
