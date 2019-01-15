@@ -4,10 +4,10 @@ library(rstan)
 library(coda)
 
 ### Source likelihood
-source("~/Dropbox/dengue.age.data.americas/Code/ll.1_pois.R")
+source("Code/ll.1_pois.R")
 
 ### Source function to plot output
-source("~/Dropbox/dengue.age.data.americas/Perspective_figure/GitHub_repo/Code/figure_plot_stan_output.R")
+source("Code/figure_plot_stan_output.R")
 
 #### Load example Brazil data
 load("Data/dhf_brazil_2002_2015.Rdata")
