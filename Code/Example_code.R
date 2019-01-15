@@ -35,47 +35,47 @@ mid_age<-ceiling(roof_age[1:18] +diff(roof_age)/2)
 
     
 #### ML optimization to obtain reasonable proposal distributions - may need this for certain datasets
-vals<-100000
-k<-1
-
-while(k<16 | (k<30 & !exists("error.mat"))) {
-  if(k%%5==0) {print(k)}
-  init.guess<-rnorm(length(rep(-3.5, times=c(max(indices.lambda2)+length(years.int)))), -4)
-  
-  opt.prov.i<-  optim (par=init.guess, fn=ll.1_pois,  counts=cases_dhf_prov[1:13,1:14], census=census.data_prov[1:13, 1:14],  years=years.int, age=mid_age[1:13], indices.lambda=indices.lambda2[1:59, 1:14],
-                       method="BFGS",
-                       control=list(trace=FALSE,  maxit=1000000),
-                       hessian=TRUE)
-  
-  if(opt.prov.i$val<vals) {opt.prov<-opt.prov.i
-  vals<-opt.prov.i$val}
-  
-  if(k==14) {try(error.mat <- diag(sqrt(solve(opt.prov$hessian)))[1:5], silent=T)    } 							
-  if(k>=15 & !exists("error.mat")) {
-    try(error.mat <- diag(sqrt(solve(opt.prov$hessian)))[1:5], silent=T)	
-    try(error.mat2 <- diag(sqrt(solve(opt.prov.i$hessian)))[1:5], silent=T) 
-    if (round(opt.prov$par[1],4)==round(opt.prov.i$par[1],4) & round(opt.prov$val, 3) == round(opt.prov.i$val, 3)) {
-      error.mat<-error.mat2
-      opt.prov<-opt.prov.i
-      vals<-opt.prov.i$val}
-    print(opt.prov$val)
-    print(opt.prov.i$val)
-  }
-  k<-k+1
-  
-}
-
-
-init.fun<-function(fit.mod) {list(logit_lambda=rnorm(max(indices.lambda2), mean=opt.prov$par[1:max(indices.lambda2)], sd=.5), logit_phi=rnorm(length(year.counts), mean=opt.prov$par[(max(indices.lambda2)+1):length(opt.prov$par)], 1))}
+# vals<-100000
+# k<-1
+# 
+# while(k<16 | (k<30 & !exists("error.mat"))) {
+#   if(k%%5==0) {print(k)}
+#   init.guess<-rnorm(length(rep(-3.5, times=c(max(indices.lambda2)+length(years.int)))), -4)
+#   
+#   opt.prov.i<-  optim (par=init.guess, fn=ll.1_pois,  counts=cases_dhf_prov[1:13,1:14], census=census.data_prov[1:13, 1:14],  years=years.int, age=mid_age[1:13], indices.lambda=indices.lambda2[1:59, 1:14],
+#                        method="BFGS",
+#                        control=list(trace=FALSE,  maxit=1000000),
+#                        hessian=TRUE)
+#   
+#   if(opt.prov.i$val<vals) {opt.prov<-opt.prov.i
+#   vals<-opt.prov.i$val}
+#   
+#   if(k==14) {try(error.mat <- diag(sqrt(solve(opt.prov$hessian)))[1:5], silent=T)    } 							
+#   if(k>=15 & !exists("error.mat")) {
+#     try(error.mat <- diag(sqrt(solve(opt.prov$hessian)))[1:5], silent=T)	
+#     try(error.mat2 <- diag(sqrt(solve(opt.prov.i$hessian)))[1:5], silent=T) 
+#     if (round(opt.prov$par[1],4)==round(opt.prov.i$par[1],4) & round(opt.prov$val, 3) == round(opt.prov.i$val, 3)) {
+#       error.mat<-error.mat2
+#       opt.prov<-opt.prov.i
+#       vals<-opt.prov.i$val}
+#     print(opt.prov$val)
+#     print(opt.prov.i$val)
+#   }
+#   k<-k+1
+#   
+# }
+# 
+# 
+## Starting values function (from optim) to feed stan
+# init.fun<-function(fit.mod) {list(logit_lambda=rnorm(max(indices.lambda2), mean=opt.prov$par[1:max(indices.lambda2)], sd=.5), logit_phi=rnorm(length(year.counts), mean=opt.prov$par[(max(indices.lambda2)+1):length(opt.prov$par)], 1))}
 
 
 ### Generate data list to feed into stan     
 data_prov<-list(A=13, Ag=60, T=ncol(cases_dhf_prov[1:13,1:14]), Y=length(years.int), L=max(indices.lambda2), I=cases_dhf_prov[1:13,1:14], C=floor(census.data_prov[2:13, 1:14]), ind_lambda=indices.lambda2[1:60,], ind_age=mid_age[1:13])
  
-    
+
 ### Compile Stan code  
 comp2<-stan(file="Code/stan_code1.stan", data=data_prov, chains=0) 
-
 
 ### Run chains 
 
@@ -86,7 +86,6 @@ comp2<-stan(file="Code/stan_code1.stan", data=data_prov, chains=0)
 set.seed(.98342)
 system.time(post1_braz<-stan(fit = comp2, data = data_prov, chains = 4, iter=20000, thin=10))
 
-    
 ### Extract and explore chains
 ext_lp<-extract(post1_braz, pars="lp__", inc_warmup=FALSE, permute=F)
 
