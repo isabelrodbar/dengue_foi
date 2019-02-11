@@ -24,7 +24,7 @@ dob2<-apply(dob, 2, function(x) {seq(max(x), min(x), -1)}) # necessary if there 
 indices.lambda<-apply(dob2, 2,  function(x)(which(is.element(years.int, x))))
 
 ### Assign constant lambda for specific periods of time - in this case we are estimating constant lambda for the last 20 years.
-indices.lambda2<-matrix(as.numeric(cut(indices.lambda, c(0, 20, 30, 40, 50, 65, 75))), ncol=14)
+indices.lambda2<-matrix(as.numeric(cut(indices.lambda, c(0, 20, 75))), ncol=14)
 
 ### If instead we want to estimate yearly lambda
 #indices.lambda2<-indices.lambda
@@ -71,7 +71,7 @@ mid_age<-ceiling(roof_age[1:18] +diff(roof_age)/2)
 
 
 ### Generate data list to feed into stan     
-data_prov<-list(A=13, Ag=60, T=ncol(cases_dhf_prov[1:13,1:14]), Y=length(years.int), L=max(indices.lambda2), I=cases_dhf_prov[1:13,1:14], C=floor(census.data_prov[2:13, 1:14]), ind_lambda=indices.lambda2[1:60,], ind_age=mid_age[1:13])
+data_prov<-list(A=13, Ag=60, T=ncol(cases_dhf_prov[1:13,1:14]), Y=length(years.int), L=max(indices.lambda2), I=cases_dhf_prov[1:13,1:14], C=floor(census.data_prov[1:13, 1:14]), ind_lambda=indices.lambda2[1:60,], ind_age=mid_age[1:13])
  
 
 ### Compile Stan code  
@@ -84,7 +84,7 @@ comp2<-stan(file="Code/stan_code1.stan", data=data_prov, chains=0)
 
 ### Without starting values
 set.seed(.98342)
-system.time(post1_braz<-stan(fit = comp2, data = data_prov, chains = 4, iter=20000, thin=10))
+system.time(post1_braz<-stan(fit = comp2, data = data_prov, chains = 4, iter=2000, thin=10, control = list(adapt_delta = 0.80)))
 
 ### Extract and explore chains
 ext_lp<-extract(post1_braz, pars="lp__", inc_warmup=FALSE, permute=F)
@@ -109,8 +109,8 @@ apply(ext_lambda_keep, 3, function(x) quantile(x, c(0.025, 0.975)))
 
 ### Plot fits
 ### Extract generated quantiles
-ext_poi<-extract(post1_braz, pars="poi_rate_g")
+#ext_poi<-extract(post1_braz, pars="poi_rate_g")
 
-pdf(file="Figures/fit_Brazil.pdf", height=10, width=7)       
-plot.stan.fun(ext_poi, count.data=cases_dhf_prov[1:13,1:14], mid_age=ceiling(mid_age[1:13]), title="Brazil", year.counts=year.counts, ind.keep=ind.keep)
-dev.off()
+#pdf(file="Figures/fit_Brazil.pdf", height=10, width=7)       
+#plot.stan.fun(ext_poi, count.data=cases_dhf_prov[1:13,1:14], mid_age=ceiling(mid_age[1:13]), title="Brazil", year.counts=year.counts, ind.keep=ind.keep)
+#dev.off()
