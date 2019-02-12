@@ -112,5 +112,5 @@ apply(ext_lambda_keep, 3, function(x) quantile(x, c(0.025, 0.975)))
 ext_poi<-extract(post1_braz5, pars="poi_rate")
 
 pdf(file="Figures/fit_Brazil.pdf", height=10, width=7)       
-plot.stan.fun(post1_braz3_nb, count.data=cases_dhf_prov[1:13,1:14], mid_age=ceiling(mid_age[1:13]), title="Brazil", year.counts=year.counts, ind.keep=ind.keep)
+plot.stan.fun(post1_braz, count.data=cases_dhf_prov[1:13,1:14], mid_age=ceiling(mid_age[1:13]), title="Brazil", year.counts=year.counts, ind.keep=NA)
 dev.off()
