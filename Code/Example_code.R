@@ -75,7 +75,7 @@ data_prov<-list(A=13, Ag=60, T=ncol(cases_dhf_prov[1:13,1:14]), Y=length(years.i
  
 
 ### Compile Stan code  
-comp2<-stan(file="Code/stan_code1.stan", data=data_prov, chains=0) 
+comp2<-stan(file="Code/stan_code1_v3.stan", data=data_prov, chains=0) 
 
 ### Run chains 
 
@@ -109,8 +109,8 @@ apply(ext_lambda_keep, 3, function(x) quantile(x, c(0.025, 0.975)))
 
 ### Plot fits
 ### Extract generated quantiles
-#ext_poi<-extract(post1_braz, pars="poi_rate_g")
+ext_poi<-extract(post1_braz5, pars="poi_rate")
 
-#pdf(file="Figures/fit_Brazil.pdf", height=10, width=7)       
-#plot.stan.fun(ext_poi, count.data=cases_dhf_prov[1:13,1:14], mid_age=ceiling(mid_age[1:13]), title="Brazil", year.counts=year.counts, ind.keep=ind.keep)
-#dev.off()
+pdf(file="Figures/fit_Brazil.pdf", height=10, width=7)       
+plot.stan.fun(post1_braz3_nb, count.data=cases_dhf_prov[1:13,1:14], mid_age=ceiling(mid_age[1:13]), title="Brazil", year.counts=year.counts, ind.keep=ind.keep)
+dev.off()
