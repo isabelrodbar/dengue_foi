@@ -12,20 +12,22 @@ col.2.rgb.fun<-function(col.pal, alpha.val=.5) {
 }
 ##### Function to process output of stan model and plot fit
 
-plot.stan.fun<-function(exob,
+plot.stan.fun<-function(model,
 						count.data, # Count data used for the fit
 						mid_age,  # mid_points of age categories in data, used for fit
 						col.plot="royalblue",
 						title=NULL,
 						year.counts=NA,
-						ind.keep
+						ind.keep=NA
 						) {
 
-pred.rate<-exob$poi_rate_g
-							
-if(length(ind.keep)<4){
-	pred.rate<-pred.rate[c(sapply(ind.keep, function(x) seq(x*1000-999, x*1000, by=1))),,]
-}							  
+
+pred.rate<-extract(model, pars="poi_rate", inc_warmup=FALSE, permute=F)
+if(!is.na(ind.keep)){
+  pred.rate<-pred.rate[,ind.keep,]
+  }
+
+pred.rate<-pred.rate[,1,]
 #### Calculate number of plots needed
 nrow_plots<-ceiling(ncol(count.data)/3)
 		
@@ -34,8 +36,8 @@ par(mfrow=c(nrow_plots, 3), mar=c(0.5, 0.5, 0.5, 0.5), oma=c(5,5,5,3 ))
 for(j in 1:ncol(count.data)) {
 	
 plot(mid_age, count.data[,j], pch=19, cex=.3, ylim=c(0, max(count.data)), ylab="", xlab="", yaxt="n", xaxt="n")
-for(i in 1:200) {
-	lines(mid_age, pred.rate[floor(runif(1, 1, dim(pred.rate)[[1]])),, j], col=col.2.rgb.fun(col.plot, .2), lwd=.05)
+for(i in 1:min(nrow(pred.rate), 200)) {
+	lines(mid_age, pred.rate[floor(runif(1, 1, dim(pred.rate)[[1]])),((j*length(mid_age)-(length(mid_age)-1))):(j*length(mid_age))], col=col.2.rgb.fun(col.plot, .2), lwd=.05)
 }
 points(mid_age, count.data[,j], pch=19, cex=.3)
 if(c(j-1)%%3==0) {
